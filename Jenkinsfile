@@ -50,7 +50,7 @@ pipeline {
                 docker{
                     //image 'node:18-alpine'
                     //image 'node:18-bullseye'
-                    image 'node:18-bullseye'
+                    image 'node:20-bullseye'
                     reuseNode true
                 }
             }
