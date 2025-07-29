@@ -64,7 +64,7 @@ pipeline {
                 '''
             }
         }
-/*
+        /*
         stage('Deploy') {
             agent {
                 docker{
@@ -83,10 +83,10 @@ pipeline {
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
             }
-        }
+        } */
     
     }
-*/
+
     post {
         always {
             junit 'test-results/junit.xml'
