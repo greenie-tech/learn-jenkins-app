@@ -63,7 +63,8 @@ pipeline {
                 stage('E2E') {
                     agent {
                         docker {
-                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            immage 'my-playwright-image'
                             reuseNode true
                             //args '-u root:root'  //why to run this as root *not recomended*
                         }
@@ -71,9 +72,11 @@ pipeline {
 
                     steps {
                         sh '''
-                            npm install serve
-                            #serve -s build
-                            node_modules/.bin/serve -s build &
+                            ## logic for local e2e tests
+                            #npm install serve
+                            #node_modules/.bin/serve -s build &
+                            ## global serve when using playwright image
+                            serve -s build &
                             sleep 10
                             npx playwright test --reporter=html
                         '''
@@ -117,7 +120,8 @@ pipeline {
         stage('Staging E2E') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'my-playwright-image'
                     reuseNode true
                 }
             }
