@@ -64,7 +64,7 @@ pipeline {
                     agent {
                         docker {
                             //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                            immage 'my-playwright-image'
+                            image 'my-playwright-image'   // Using the custom image built earlier
                             reuseNode true
                             //args '-u root:root'  //why to run this as root *not recomended*
                         }
