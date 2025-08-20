@@ -7,6 +7,20 @@ pipeline {
         REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
     stages {
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                }
+            }
+        }
+        steps {
+            sh '''
+                'aws --version'
+            '''
+        }
+        
+        
         stage('Docker') {
             steps {
                 // build the docker image using the local Docker file. 
