@@ -11,7 +11,7 @@ pipeline {
             agent {
                 docker {
                     image 'amazon/aws-cli'
-                    args "--entrypoint=''" //
+                    args "--entrypoint=''" //needed to prevent container from exiting immediately
                 }
             }
             steps {
