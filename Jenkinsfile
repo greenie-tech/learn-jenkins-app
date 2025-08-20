@@ -9,6 +9,9 @@ pipeline {
     stages {
         stage('Docker') {
             steps {
+                // build the docker image using the local Docker file. 
+                // The -t is for tagging the image
+                // The "." specifies the build context (current directory) where the Dockerfile is located
                 sh 'docker build -t my-playwright-image .'
             }
         }
