@@ -13,14 +13,13 @@ pipeline {
                     image 'amazon/aws-cli'
                 }
             }
+            steps {
+                sh '''
+                    aws --version
+                '''
+            }
         }
-        steps {
-            sh '''
-                'aws --version'
-            '''
-        }
-        
-        
+
         stage('Docker') {
             steps {
                 // build the docker image using the local Docker file. 
