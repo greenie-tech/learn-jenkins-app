@@ -21,9 +21,9 @@ pipeline {
                     aws --version
                     aws s3 ls
                 '''
+                }
             }
         }
-
         stage('Docker') {
             steps {
                 // build the docker image using the local Docker file. 
