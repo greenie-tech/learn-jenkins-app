@@ -15,12 +15,15 @@ pipeline {
                     args "--entrypoint=''" //needed to prevent container from exiting immediately
                 }
             }
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
                         aws --version
                         echo "Hello S3!" > index.html
-                        #aws s3 ls
+                        aws s3 ls
                         aws s3 cp index.html s3://gtech-learn-jenkins/index.html
                     '''
                 }
