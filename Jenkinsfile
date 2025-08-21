@@ -16,7 +16,7 @@ pipeline {
                 }
             }
             environment {
-                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+                CI_ENVIRONMENT_URL = AWS_S3_BUCKET = 'gtech-learn-jenkins'
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
