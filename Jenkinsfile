@@ -44,6 +44,7 @@ pipeline {
             agent {
                 docker {
                     image 'amazon/aws-cli'
+                    reuseNode true
                     args "--entrypoint=''" //needed to prevent container from exiting immediately
                 }
             }
@@ -64,7 +65,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Tests') {
             parallel {
                 stage('Unit Test') {
