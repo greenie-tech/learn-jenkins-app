@@ -8,27 +8,7 @@ pipeline {
 
     }
     stages {
-        stage('AWS') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    args "--entrypoint=''" //needed to prevent container from exiting immediately
-                }
-            }
-            environment {
-                AWS_S3_BUCKET = 'gtech-learn-jenkins'
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                    sh '''
-                        aws --version
-                        echo "Hello S3!" > index.html
-                        aws s3 ls
-                        aws s3 cp index.html s3://gtech-learn-jenkins/index.html
-                    '''
-                }
-            }
-        }
+        
         stage('Docker') {
             steps {
                 // build the docker image using the local Docker file. 
@@ -59,7 +39,32 @@ pipeline {
                 '''
             }
         }
-
+        
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''" //needed to prevent container from exiting immediately
+                }
+            }
+            environment {
+                AWS_S3_BUCKET = 'gtech-learn-jenkins'
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        aws --version
+                        #echo "Hello S3!" > index.html
+                        pwd
+                        ls
+                        aws s3 ls
+                        #aws s3 cp index.html s3://gtech-learn-jenkins/index.html
+                        aws s3 sync build s3://$AWS_S3_BUCKET
+                    '''
+                }
+            }
+        }
+        
         stage('Tests') {
             parallel {
                 stage('Unit Test') {
