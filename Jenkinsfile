@@ -5,6 +5,7 @@ pipeline {
         NETLIFY_SITE_ID = '56b5332e-fcf9-47db-a532-7b5159029fee'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         REACT_APP_VERSION = "1.0.$BUILD_ID"
+        AWS_DEFAULT_REGION = 'us-east-1'
 
     }
     stages {
@@ -40,7 +41,7 @@ pipeline {
             }
         }
         
-        stage('AWS') {
+        stage('AWS S3 Upload') {
             agent {
                 docker {
                     image 'amazon/aws-cli'
@@ -61,6 +62,30 @@ pipeline {
                         aws s3 ls
                         #aws s3 cp index.html s3://gtech-learn-jenkins/index.html
                         aws s3 sync build s3://$AWS_S3_BUCKET
+                    '''
+                }
+            }
+        }
+
+         stage('AWS ECS Deploy') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args "--entrypoint=''" //needed to prevent container from exiting immediately
+                }
+            }
+            /*
+            environment {
+                AWS_S3_BUCKET = 'gtech-learn-jenkins'
+            }
+            */
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        aws --version
+                        aws ecs register-task-definition --cli-input-json file://aws/task-definition-prod.json
+                        #aws ecs update-service --cluster learn-jenkins-cluster --service learn-jenkins-service --force-new-deployment
                     '''
                 }
             }
