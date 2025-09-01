@@ -51,7 +51,26 @@ pipeline {
         }
         
         stage('Build Docker Image (myjenkinsapp)') {
-            steps {
+            agent {
+                docker {
+                    // Use the Amazon AWS CLI image
+                    image 'amazon/aws-cli'
+
+                    // Reuse the same Docker node
+                    reuseNode true
+
+                    // -u root execute as root user
+                    // Mount the Docker socket using -v /var/run/docker.sock:/var/run/docker.sock
+                    // --entrypoint='' needed to prevent container from exiting immediately
+                    args "-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=''"
+                }
+            }
+            steps {  
+                // Install Docker for amazon linux
+                amazon-linux-extras install docker
+
+
+
                 // build the docker image using the local Docker file
                 // The -t is for tagging the image
                 // The "." specifies the build context (current directory) where the Dockerfile is located
