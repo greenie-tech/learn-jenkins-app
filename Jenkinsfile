@@ -67,14 +67,19 @@ pipeline {
             }
             steps {  
                 sh '''
+                    # Print the image ID to get version details
                     cat /etc/image-id
-                    #Install Docker for amazon linux
-                    #amazon-linux-extras install docker
-                    dnf install docker -y
+                    
+                    # Install Docker for amazon linux
+                        # This amazon-linux-extras command doesn't work on 2023 aws cli image
+                        # amazon-linux-extras install docker
 
-                    #build the docker image using the local Docker file
-                    #The -t is for tagging the image
-                    #The "." specifies the build context (current directory) where the Dockerfile is located
+                        # Install Docker using dnf on Amazon Linux 2023
+                        dnf install docker -y
+
+                    # build the docker image using the local Docker file
+                    # The -t is for tagging the image
+                    # The "." specifies the build context (current directory) where the Dockerfile is located
                     docker build -t myjenkinsapp .
                 '''
             }
