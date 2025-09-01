@@ -70,6 +70,7 @@ pipeline {
                     cat /etc/image-id
                     #Install Docker for amazon linux
                     #amazon-linux-extras install docker
+                    dnf install docker -y
 
                     #build the docker image using the local Docker file
                     #The -t is for tagging the image
