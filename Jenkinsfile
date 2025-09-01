@@ -12,13 +12,13 @@ pipeline {
 
     }
     stages {
-        
-        stage('Docker') {
+
+        stage('Build Docker Image (Playwright)') {
             steps {
-                // build the docker image using the local Docker file. 
+                // build the docker image using the local Docker file in 'ci' directory.
                 // The -t is for tagging the image
                 // The "." specifies the build context (current directory) where the Dockerfile is located
-                sh 'docker build -t my-playwright-image .'
+                sh 'docker build -f ci/Dockerfile -t my-playwright-image .'
             }
         }
 
@@ -37,8 +37,14 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
+
+                    # Install dependencies (clean install)
                     npm ci
+
+                    # Build the application
                     npm run build
+
+                    # List the contents of directory after build
                     ls -la
                 '''
             }
@@ -47,8 +53,13 @@ pipeline {
         stage('AWS S3 Upload') {
             agent {
                 docker {
+                    // Use the Amazon AWS CLI image
                     image 'amazon/aws-cli'
+
+                    // Reuse the same Docker node
                     reuseNode true
+
+                    // Prevent container from exiting immediately
                     args "--entrypoint=''" //needed to prevent container from exiting immediately
                 }
             }
@@ -58,12 +69,21 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
+                        # Print the AWS CLI version
                         aws --version
                         #echo "Hello S3!" > index.html
+
+                        # Print the current working directory
                         pwd
+
+                        # List files in the current directory
                         ls
+
+                        # List S3 bucket contents
                         aws s3 ls
                         #aws s3 cp index.html s3://gtech-learn-jenkins/index.html
+
+                        # Sync the build directory to S3
                         aws s3 sync build s3://$AWS_S3_BUCKET
                     '''
                 }
@@ -73,8 +93,13 @@ pipeline {
          stage('AWS ECS Deploy') {
             agent {
                 docker {
+                    // Use the Amazon AWS CLI image
                     image 'amazon/aws-cli'
+
+                    // Reuse the same Docker node
                     reuseNode true
+
+                    // Prevent container from exiting immediately
                     args "-u root --entrypoint=''" //needed to execute as root user and prevent container from exiting immediately
                 }
             }
@@ -84,13 +109,23 @@ pipeline {
             }
             */
             steps {
+                // Deploy to AWS ECS
                 withCredentials([usernamePassword(credentialsId: 'gtech-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
+                        # Install AWS CLI v2
                         aws --version
+
+                        # Install jq for JSON parsing
                         yum install jq -y
+
+                        # Register new task definition from local json file and capture the revision number using jq
                         LATEST_TD_REVISION=$(aws ecs register-task-definition --cli-input-json file://aws/task-definition-prod.json | jq '.taskDefinition.revision')
+
+                        # Update the existing ECS service to use the new task definition revision
                         aws ecs update-service --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD --task-definition $AWS_ECS_TD_PROD:$LATEST_TD_REVISION
-                        #aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD
+
+                        # Wait for the ECS service to stabilize
+                        aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD
                     '''
                 }
             }
@@ -109,13 +144,19 @@ pipeline {
                     }
                     steps {
                         sh '''
+                            # Unit Test Stage
                             echo "Test Stage"
+
+                            # Check if the build artifact exists
                             test -f build/index.html
-                            npm test 
+
+                            # Run the tests
+                            npm test
                         '''
                     }
                     post {
                         always {
+                            // Publish JUnit test results
                             junit 'jest-results/junit.xml'
                         }
                     }
@@ -126,6 +167,8 @@ pipeline {
                         docker {
                             //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                             image 'my-playwright-image'   // Using the custom image built earlier
+
+                            // Reuse the same Docker node
                             reuseNode true
                             //args '-u root:root'  //why to run this as root *not recomended*
                         }
