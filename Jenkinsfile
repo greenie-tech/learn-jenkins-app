@@ -66,15 +66,15 @@ pipeline {
                 }
             }
             steps {  
-                // Install Docker for amazon linux
-                amazon-linux-extras install docker
+                sh '''
+                    #Install Docker for amazon linux
+                    amazon-linux-extras install docker
 
-
-
-                // build the docker image using the local Docker file
-                // The -t is for tagging the image
-                // The "." specifies the build context (current directory) where the Dockerfile is located
-                sh 'docker build -t myjenkinsapp .'
+                    #build the docker image using the local Docker file
+                    #The -t is for tagging the image
+                    #The "." specifies the build context (current directory) where the Dockerfile is located
+                    docker build -t myjenkinsapp .
+                '''
             }
         }
 
