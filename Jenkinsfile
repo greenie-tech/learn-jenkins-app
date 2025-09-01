@@ -28,7 +28,7 @@ pipeline {
                     //image 'node:18-alpine'
                     //image 'node:18-bullseye'
                     image 'node:20-bullseye'
-                    reuseNode true
+                    //reuseNode true
                 }
             }
             steps {
@@ -125,7 +125,7 @@ pipeline {
                         aws ecs update-service --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD --task-definition $AWS_ECS_TD_PROD:$LATEST_TD_REVISION
 
                         # Wait for the ECS service to stabilize
-                        aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD
+                        #aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE_PROD
                     '''
                 }
             }
