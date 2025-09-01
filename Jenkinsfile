@@ -67,6 +67,7 @@ pipeline {
             }
             steps {  
                 sh '''
+                    cat /etc/image-id
                     #Install Docker for amazon linux
                     #amazon-linux-extras install docker
 
