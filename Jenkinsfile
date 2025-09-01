@@ -68,7 +68,7 @@ pipeline {
             steps {  
                 sh '''
                     #Install Docker for amazon linux
-                    amazon-linux-extras install docker
+                    #amazon-linux-extras install docker
 
                     #build the docker image using the local Docker file
                     #The -t is for tagging the image
