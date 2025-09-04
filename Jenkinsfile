@@ -12,7 +12,7 @@ pipeline {
 
     }
     stages {
-
+        /*
         stage('Build Docker Image (Playwright)') {
             steps {
                 // build the docker image using the local Docker file in 'ci' directory.
@@ -21,7 +21,7 @@ pipeline {
                 sh 'docker build -f ci/Dockerfile -t my-playwright-image .'
             }
         }
-
+        */
         stage('Build') {
             agent {
                 docker{
@@ -69,7 +69,7 @@ pipeline {
                 sh '''
                     # Print the image ID to get version details
                     cat /etc/image-id
-                    
+
                     # Install Docker for amazon linux
                         # This amazon-linux-extras command doesn't work on 2023 aws cli image
                         # amazon-linux-extras install docker
