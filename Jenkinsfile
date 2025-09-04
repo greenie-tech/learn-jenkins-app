@@ -53,8 +53,12 @@ pipeline {
         stage('Build Docker Image (myjenkinsapp)') {
             agent {
                 docker {
-                    // Use the Amazon AWS CLI image
+                    /* Use the Amazon AWS CLI image
                     image 'amazon/aws-cli'
+                    */
+
+                    // Use custom image with docker installed
+                    image 'my-aws-cli'
 
                     // Reuse the same Docker node
                     reuseNode true
@@ -89,7 +93,10 @@ pipeline {
             agent {
                 docker {
                     // Use the Amazon AWS CLI image
-                    image 'amazon/aws-cli'
+                    //image 'amazon/aws-cli'
+
+                    // Using the custom image from nightly builds
+                    image 'my-aws-cli'
 
                     // Reuse the same Docker node
                     reuseNode true
@@ -129,7 +136,8 @@ pipeline {
             agent {
                 docker {
                     // Use the Amazon AWS CLI image
-                    image 'amazon/aws-cli'
+                      //image 'amazon/aws-cli'
+                    image 'my-aws-cli'
 
                     // Reuse the same Docker node
                     reuseNode true
@@ -201,7 +209,8 @@ pipeline {
                     agent {
                         docker {
                             //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                            image 'my-playwright-image'   // Using the custom image built earlier
+                            //image 'my-playwright-image'   // Using the custom image built earlier
+                            image 'my-playwright' // Using the custom image built from nightly build
 
                             // Reuse the same Docker node
                             reuseNode true
@@ -260,7 +269,8 @@ pipeline {
             agent {
                 docker {
                     //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    image 'my-playwright-image'
+                    //image 'my-playwright-image'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
