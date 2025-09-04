@@ -4,9 +4,10 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '56b5332e-fcf9-47db-a532-7b5159029fee'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
-        APP_NAME = 'LearnJenkinsApp'
+        APP_NAME = 'learn-jenkins-app'
         REACT_APP_VERSION = "1.0.$BUILD_ID"
         AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_DOCKER_REGISTRY = '539685297057.dkr.ecr.us-east-1.amazonaws.com'
         AWS_ECS_CLUSTER = 'LearnJenkinsApp-Cluster-Prod'
         AWS_ECS_SERVICE_PROD = 'LearnJenkinsApp-Service-Prod'
         AWS_ECS_TD_PROD = 'LearnJenkinsApp-TaskDefinition-Prod'
@@ -70,23 +71,30 @@ pipeline {
                     args "-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=''"
                 }
             }
-            steps {  
-                sh '''
-                    # Print the image ID to get version details
-                    cat /etc/image-id
+            steps { 
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        # Print the image ID to get version details
+                        cat /etc/image-id
 
-                    # Install Docker for amazon linux
-                        # This amazon-linux-extras command doesn't work on 2023 aws cli image
-                        # amazon-linux-extras install docker
+                        # Install Docker for amazon linux
+                            # This amazon-linux-extras command doesn't work on 2023 aws cli image
+                            # amazon-linux-extras install docker
 
-                        # Install Docker using dnf on Amazon Linux 2023
-                        dnf install docker -y
+                            # Install Docker using dnf on Amazon Linux 2023
+                            dnf install docker -y
 
-                    # build the docker image using the local Docker file
-                    # The -t is for tagging the image
-                    # The "." specifies the build context (current directory) where the Dockerfile is located
-                    docker build -t $APP_NAME:$REACT_APP_VERSION .
-                '''
+                        # build the docker image using the local Docker file
+                        # The -t is for tagging the image
+                        # The "." specifies the build context (current directory) where the Dockerfile is located
+                        # docker build -t $APP_NAME:$REACT_APP_VERSION .
+
+                        docker build -t $AWS_DOCKER_REGISTRY/$APP_NAME:$REACT_APP_VERSION .
+                        aws ecr get-login-password | docker login --username AWS --password-stdin $AWS_DOCKER_REGISTRY
+                        docker push $AWS_DOCKER_REGISTRY/$APP_NAME:$REACT_APP_VERSION
+            
+                    '''
+                }   
             }
         }
 
