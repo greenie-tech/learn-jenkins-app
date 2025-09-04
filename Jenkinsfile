@@ -4,6 +4,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '56b5332e-fcf9-47db-a532-7b5159029fee'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        APP_NAME = 'my-jenkins-app'
         REACT_APP_VERSION = "1.0.$BUILD_ID"
         AWS_DEFAULT_REGION = 'us-east-1'
         AWS_ECS_CLUSTER = 'LearnJenkinsApp-Cluster-Prod'
@@ -84,7 +85,7 @@ pipeline {
                     # build the docker image using the local Docker file
                     # The -t is for tagging the image
                     # The "." specifies the build context (current directory) where the Dockerfile is located
-                    docker build -t myjenkinsapp .
+                    docker build -t $APP_NAME:$REACT_APP_VERSION .
                 '''
             }
         }
