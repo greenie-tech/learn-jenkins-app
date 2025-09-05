@@ -5,8 +5,18 @@
     "family": "LearnJenkinsApp-TaskDefinition-Prod",
     "containerDefinitions": [
         {
-            "name": "learnjenkinsapp",
-            "image": "nginx:1.27-alpine",
+            "name": "learn-jenkins-app",
+            "image": "539685297057.dkr.ecr.us-east-1.amazonaws.com/learn-jenkins-app:1.0.129",
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/LearnJenkinsApp-TaskDefinition-Prod",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
             "portMappings": [
                 {
                     "name": "ngnix-80-tcp",
@@ -23,5 +33,9 @@
     "networkMode": "awsvpc",
     "memory": "512",
     "cpu": "256",
-    "executionRoleArn": ""
+    "runtimePlatform": {
+        "cpuArchitecture": "ARM64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "executionRoleArn": "arn:aws:iam::539685297057:role/ecsTaskExecutionRole"
 }
