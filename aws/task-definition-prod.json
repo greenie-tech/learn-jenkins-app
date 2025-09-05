@@ -6,7 +6,7 @@
     "containerDefinitions": [
         {
             "name": "learn-jenkins-app",
-            "image": "539685297057.dkr.ecr.us-east-1.amazonaws.com/learn-jenkins-app:1.0.129",
+            "image": "539685297057.dkr.ecr.us-east-1.amazonaws.com/learn-jenkins-app:#APP_VERSION#",
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {

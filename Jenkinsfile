@@ -170,6 +170,9 @@ pipeline {
                         # Install jq for JSON parsing
                         yum install jq -y
 
+                        # Update the task definition with the new image tag
+                        sed -i "s/#APP_VERSION#/$REACT_APP_VERSION/g" aws/task-definition-prod.json
+
                         # Register new task definition from local json file and capture the revision number using jq
                         LATEST_TD_REVISION=$(aws ecs register-task-definition --cli-input-json file://aws/task-definition-prod.json | jq '.taskDefinition.revision')
 
